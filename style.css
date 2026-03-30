@@ -109,3 +109,18 @@ input[type=number] {
     -moz-appearance: textfield;
     appearance: textfield;
 }
+/* Garante que o celular não dê zoom ao clicar nos campos */
+input[type="number"], 
+input[type="text"], 
+select {
+    font-size: 16px !important;
+}
+
+/* Opcional: Melhora o toque no celular (faz os campos ficarem maiores para o dedo) */
+.serie-row input {
+    padding: 12px 8px !important;
+}
+
+.btn-add-serie, .btn-finalizar {
+    min-height: 48px; /* Tamanho ideal para o polegar */
+}
