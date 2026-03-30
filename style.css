@@ -1,0 +1,111 @@
+body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.container { max-width: 500px; margin: auto; }
+
+header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+
+select { background: #333; color: white; border: 1px solid #555; padding: 10px; border-radius: 8px; }
+
+.card-exercicio {
+    background: #1e1e1e;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #333;
+}
+
+.nota-fixa { color: #aaa; font-style: italic; font-size: 0.9em; margin-bottom: 10px; }
+
+.serie-row { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 10px; margin-top: 10px; }
+
+input {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: white;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+#btn-finalizar {
+    width: 100%;
+    padding: 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Container da série usando Flexbox */
+.serie-row {
+    display: flex;
+    flex-wrap: wrap; /* Permite que a nota pule de linha */
+    gap: 10px; /* Aumentei um pouco o gap para espaçar o check */
+    margin-top: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #333;
+    align-items: center; /* Alinha verticalmente os elementos na linha */
+}
+
+/* Novo: Estilo do container do checkbox para alinhamento */
+.check-container {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Espaço entre o check e o texto 'WS' */
+    color: #007bff; /* Cor azul para destacar */
+    font-size: 0.9em;
+    font-weight: bold;
+    flex-shrink: 0; /* Impede que o check diminua */
+}
+
+/* Estilo do input checkbox em si */
+.check-container input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin: 0; /* Remove margens padrão */
+    cursor: pointer;
+    accent-color: #007bff; /* Muda a cor de preenchimento do check quando marcado */
+}
+
+/* Inputs numéricos (Peso e Reps) */
+.serie-row input[type="number"] {
+    flex: 1 1 calc(50% - 70px); /* Ajustado para dar espaço ao check */
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    min-width: 60px;
+}
+
+/* Input de texto (Nota) - Ocupa a linha toda abaixo */
+.serie-row input[type="text"] {
+    flex: 1 1 100%; /* Força a nota a ocupar 100% da largura */
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+/* ... mantenha o resto do CSS ... */
+
+/* Remove as setinhas para navegadores baseados em Webkit (Chrome, Safari, Edge) */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Remove as setinhas para o Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}

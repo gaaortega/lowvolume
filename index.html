@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Treino Personalizado</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Meus Treinos</h1>
+            <select id="select-treino">
+                <option value="A">Treino A (Push)</option>
+                <option value="B">Treino B (Pull)</option>
+                <option value="C">Treino C (Legs)</option>
+                <option value="D">Treino D (Upper)</option>
+                <option value="E">Treino E (Lower)</option>
+            </select>
+        </header>
+
+        <main id="lista-exercicios">
+            </main>
+
+        <button id="btn-finalizar" onclick="exportarPDF()">Finalizar e Gerar PDF</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
