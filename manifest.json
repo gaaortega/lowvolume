@@ -1,6 +1,6 @@
 {
   "name": "Meu Treino Low Volume",
-  "short_name": "TreinoLV",
+  "short_name": "Low Volume",
   "description": "App para registro de treinos focado em alta intensidade e baixo volume.",
   "start_url": "index.html",
   "display": "standalone",
