@@ -51,17 +51,14 @@ function renderizarTreino(tipo) {
             <h3>${ex.nome}</h3>
             <p class="nota-fixa">${ex.notaFixa}</p>
             <div id="series-container-${idx}"></div>
-            <button class="btn-add-serie" onclick="adicionarSerie(${idx})">+ Adicionar Série</button>
+            <button class="btn-add-serie" onclick="adicionarSerie(${idx})">+ Série</button>
         `;
         container.appendChild(div);
         
         const sCont = document.getElementById(`series-container-${idx}`);
         const antEx = anterior[idx];
-        
         if (antEx && antEx.series && antEx.series.length > 0) {
-            antEx.series.forEach(s => {
-                sCont.appendChild(criarElementoSerie('', '', '', s.peso, s.reps, s.nota, s.isWorkSet, s.isMR));
-            });
+            antEx.series.forEach(s => sCont.appendChild(criarElementoSerie('', '', '', s.peso, s.reps, s.nota, s.isWorkSet, s.isMR)));
         } else {
             sCont.appendChild(criarElementoSerie());
         }
@@ -72,16 +69,26 @@ function renderizarTreino(tipo) {
 function criarElementoSerie(peso='', reps='', nota='', pAnt='', rAnt='', nAnt='', isWS=false, isMR=false) {
     const div = document.createElement('div');
     div.className = 'serie-row';
+    // O placeholder agora mostra o número puro. O 'kg' é só visual no texto do placeholder.
+    const pPlaceholder = pAnt ? pAnt : "Peso";
+    const rPlaceholder = rAnt ? rAnt : "Reps";
+
     div.innerHTML = `
         <div class="serie-controls">
-            <label class="check-container ws-label"><input type="checkbox" class="ws-check" ${isWS?'checked':''} onchange="salvarProgresso()"><span>WS</span></label>
-            <label class="check-container mr-label"><input type="checkbox" class="mr-check" ${isMR?'checked':''} onchange="salvarProgresso()"><span>MR</span></label>
+            <label class="check-container ws-label"><input type="checkbox" class="ws-check" ${isWS?'checked':''}><span>WS</span></label>
+            <label class="check-container mr-label"><input type="checkbox" class="mr-check" ${isMR?'checked':''}><span>MR</span></label>
         </div>
-        <input type="number" class="peso-input" placeholder="${pAnt?pAnt+'kg':'Peso'}" value="${peso}" oninput="salvarProgresso()">
-        <input type="number" class="reps-input" placeholder="${rAnt||'Reps'}" value="${reps}" oninput="salvarProgresso()">
-        <input type="text" class="nota-input" placeholder="${nAnt||'Nota'}" value="${nota}" oninput="salvarProgresso()">
+        <input type="number" class="peso-input" placeholder="${pPlaceholder}" value="${peso}" step="any">
+        <input type="number" class="reps-input" placeholder="${rPlaceholder}" value="${reps}">
+        <input type="text" class="nota-input" placeholder="${nAnt||'Nota'}" value="${nota}">
         <button class="btn-delete-serie" onclick="removerSerie(this)">×</button>
     `;
+    
+    // Salva automaticamente em qualquer mudança nos inputs ou checks
+    div.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', salvarProgresso);
+    });
+    
     return div;
 }
 
@@ -91,7 +98,7 @@ function adicionarSerie(idx) {
 }
 
 function removerSerie(btn) {
-    if(confirm("Excluir esta série?")){
+    if(confirm("Excluir série?")) {
         btn.parentElement.remove();
         salvarProgresso();
     }
@@ -120,7 +127,7 @@ function carregarProgresso(tipo) {
     if (!salvo) return;
     const cards = document.querySelectorAll('.card-exercicio');
     cards.forEach((card, idx) => {
-        if (salvo[idx] && salvo[idx].series.length > 0) {
+        if (salvo[idx] && salvo[idx].series) {
             const sCont = card.querySelector(`[id^="series-container"]`);
             sCont.innerHTML = '';
             salvo[idx].series.forEach(s => {
@@ -134,11 +141,11 @@ function exportarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const dataAtual = new Date().toLocaleDateString('pt-BR');
-    let volumeTotalGeral = 0;
+    let volumeTotal = 0;
     let y = 40;
 
     doc.setFontSize(16);
-    doc.text(`Relatório de Treino: ${seletor.selectedOptions[0].text}`, 10, 20);
+    doc.text(`Treino: ${seletor.selectedOptions[0].text}`, 10, 20);
     doc.setFontSize(11);
     doc.text(`Data: ${dataAtual}`, 10, 28);
     doc.line(10, 32, 200, 32);
@@ -147,44 +154,44 @@ function exportarPDF() {
         const nome = card.querySelector('h3').innerText;
         const rows = card.querySelectorAll('.serie-row');
         
-        doc.setFont("helvetica", "bold");
-        doc.text(nome.toUpperCase(), 10, y); y += 7;
-        doc.setFont("helvetica", "normal");
-
-        rows.forEach((row, i) => {
-            const pInp = row.querySelector('.peso-input');
-            const rInp = row.querySelector('.reps-input');
-            const nInp = row.querySelector('.nota-input');
-            
-            // Lógica: pega o valor digitado. Se não houver, pega o placeholder.
-            let pStr = pInp.value || pInp.getAttribute('placeholder') || "0";
-            let rStr = rInp.value || rInp.getAttribute('placeholder') || "0";
-
-            // Limpeza: remove 'kg', espaços ou qualquer texto, sobrando apenas números e ponto
-            let pNum = parseFloat(pStr.toString().replace(/[^0-9.]/g, '')) || 0;
-            let rNum = parseInt(rStr.toString().replace(/[^0-9]/g, '')) || 0;
-
-            const volumeSerie = pNum * rNum;
-            volumeTotalGeral += volumeSerie;
-
-            const isMR = row.querySelector('.mr-check').checked;
-            const isWS = row.querySelector('.ws-check').checked;
-            const status = isMR ? "[MR]" : (isWS ? "[WS]" : "[  ]");
-            const obs = nInp.value || "-";
-            
-            doc.text(`${status} Set ${i+1}: ${pNum}kg x ${rNum} reps | Obs: ${obs}`, 15, y);
-            y += 6;
-            if(y > 275){ doc.addPage(); y = 20; }
+        let exercicioTemDados = false;
+        rows.forEach(row => {
+            if(row.querySelector('.peso-input').value || row.querySelector('.peso-input').placeholder !== "Peso") exercicioTemDados = true;
         });
-        y += 5;
+
+        if(exercicioTemDados) {
+            doc.setFont("helvetica", "bold");
+            doc.text(nome, 10, y); y += 7;
+            doc.setFont("helvetica", "normal");
+
+            rows.forEach((row, i) => {
+                const pInp = row.querySelector('.peso-input');
+                const rInp = row.querySelector('.reps-input');
+                
+                // Pega valor real ou placeholder
+                let vPeso = parseFloat(pInp.value) || parseFloat(pInp.placeholder) || 0;
+                let vReps = parseInt(rInp.value) || parseInt(rInp.placeholder) || 0;
+
+                const vVolume = vPeso * vReps;
+                volumeTotal += vVolume;
+
+                const isMR = row.querySelector('.mr-check').checked;
+                const isWS = row.querySelector('.ws-check').checked;
+                const status = isMR ? "[MR]" : (isWS ? "[WS]" : "[  ]");
+                
+                doc.text(`${status} Set ${i+1}: ${vPeso}kg x ${vReps} reps`, 15, y);
+                y += 6;
+                if(y > 275){ doc.addPage(); y = 20; }
+            });
+            y += 4;
+        }
     });
 
     doc.setFont("helvetica", "bold");
-    doc.text(`VOLUME TOTAL DO TREINO: ${volumeTotalGeral.toLocaleString('pt-BR')} kg`, 10, y + 10);
+    doc.text(`VOLUME TOTAL: ${volumeTotal.toLocaleString('pt-BR')} kg`, 10, y + 10);
     
-    doc.save(`Treino_${dataAtual.replace(/\//g,'-')}.pdf`);
+    doc.save(`Treino_${seletor.value}_${dataAtual.replace(/\//g,'-')}.pdf`);
     
-    // Rotacionar para histórico
     localStorage.setItem(`treino_anterior_${seletor.value}`, localStorage.getItem(`treino_atual_${seletor.value}`));
     localStorage.removeItem(`treino_atual_${seletor.value}`);
     renderizarTreino(seletor.value);
