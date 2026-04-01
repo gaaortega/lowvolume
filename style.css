@@ -1,218 +1,123 @@
-/* Configurações Globais e Nova Fonte */
 * { 
     box-sizing: border-box; 
     margin: 0; 
     padding: 0; 
-    font-family: 'Montserrat', sans-serif; /* Fonte arredondada e moderna */
+    font-family: 'Montserrat', sans-serif; 
 }
 
 body { 
     background: #121212; 
     color: white; 
-    padding: 20px; 
-    padding-bottom: 160px; /* Espaço para o footer fixo */
-    -webkit-font-smoothing: antialiased;
+    padding: 15px; 
+    padding-bottom: 160px; 
 }
 
-header {
-    margin-bottom: 25px;
-}
-
-.header-content { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-}
-
-h1 {
-    font-weight: 700;
-    font-size: 22px;
-}
+header { margin-bottom: 20px; }
+.header-content { display: flex; justify-content: space-between; align-items: center; }
+h1 { font-size: 20px; font-weight: 700; }
 
 select { 
     background: #2a2a2a; 
     color: white; 
-    padding: 12px; 
-    border-radius: 10px; 
-    font-size: 16px; 
-    border: 1px solid #444;
+    padding: 10px; 
+    border-radius: 8px; 
+    border: 1px solid #444; 
 }
 
-/* Card do Exercício */
 .card-exercicio { 
     background: #1e1e1e; 
-    border-radius: 16px; 
-    padding: 20px; 
-    margin-bottom: 25px; 
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-}
-
-h3 { 
-    color: #007bff; 
-    margin-bottom: 8px; 
-    font-weight: 700;
-    font-size: 18px;
-    text-transform: uppercase;
-}
-
-.nota-fixa { 
-    font-size: 12px; 
-    color: #aaa; 
+    border-radius: 12px; 
+    padding: 15px; 
     margin-bottom: 20px; 
-    line-height: 1.5; 
-    font-weight: 400;
 }
 
-/* Novo Layout da Série (IGUAL IMAGEM 3) */
-.series-list-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+h3 { color: #007bff; font-size: 17px; margin-bottom: 5px; }
+.nota-fixa { font-size: 11px; color: #888; margin-bottom: 15px; }
 
+/* CONTAINER DA SÉRIE */
+.series-list-container { display: flex; flex-direction: column; gap: 10px; }
 .serie-row { 
-    background: #262626;
-    padding: 15px;
-    border-radius: 12px;
-    border: 1px solid #333;
+    background: #262626; 
+    padding: 12px; 
+    border-radius: 10px; 
+    border: 1px solid #333; 
 }
 
-/* Linha Superior: Checks, Inputs e Delete */
+/* PRIMEIRA LINHA: Checks e Números */
 .serie-main-controls {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 10px; /* Espaço para o campo Nota embaixo */
+    gap: 8px;
+    margin-bottom: 8px;
 }
 
-/* Contêiner dos Checkboxes MR/WS */
 .serie-checks-group {
     display: flex;
-    gap: 8px;
-    background: #1e1e1e;
-    padding: 5px;
-    border-radius: 8px;
-    border: 1px solid #444;
-}
-
-.check-container { 
-    font-size: 14px; 
-    font-weight: 600;
-    display: flex; 
-    align-items: center; 
-    gap: 5px; 
-    cursor: pointer;
-    padding: 5px 8px;
+    gap: 5px;
+    background: #1a1a1a;
+    padding: 4px;
     border-radius: 6px;
-    transition: background 0.2s;
 }
 
-/* Estilos de cores baseados na Imagem 3 */
-.mr-label { color: #ff9800; } /* Laranja para MR */
-.ws-label { color: #007bff; } /* Azul para WS */
+.check-container { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 3px; }
+.ws-label { color: #007bff; }
+.mr-label { color: #ff9800; }
 
-/* Estilo quando checado (opcional, para feedback visual) */
-.check-container input:checked + span {
-    font-weight: 700;
-}
-
-/* Inputs de Número (Peso/Reps) */
 input[type="number"] { 
     background: #333; 
     border: 1px solid #444; 
     color: white; 
-    padding: 12px; 
-    border-radius: 8px; 
-    font-size: 16px; 
-    width: 75px; /* Tamanho fixo para Peso e Reps */
+    padding: 10px 5px; 
+    border-radius: 6px; 
+    font-size: 14px; 
+    width: 65px; /* Reduzido para caber melhor */
     text-align: center;
-    font-weight: 600;
 }
 
-/* Input de Nota (Ocupa o espaço restante) */
+/* SEGUNDA LINHA: Nota e Botão X */
+.serie-second-row {
+    display: flex;
+    gap: 8px;
+}
+
 .nota-input { 
     background: #333; 
     border: 1px solid #444; 
     color: white; 
-    padding: 12px; 
-    border-radius: 8px; 
-    font-size: 15px; 
-    flex: 1; /* Ocupa todo espaço disponível */
+    padding: 10px; 
+    border-radius: 6px; 
+    font-size: 14px; 
+    flex: 1; /* Ocupa o máximo de espaço */
 }
 
-/* Botão Excluir (X Vermelho) */
 .btn-delete-serie { 
-    background: #441111; 
+    background: #331111; 
     color: #ff4444; 
     border: 1px solid #ff4444; 
     width: 40px; 
-    height: 40px; 
-    border-radius: 8px; 
-    font-size: 20px;
-    font-weight: 700;
+    border-radius: 6px; 
+    font-weight: bold;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
 }
 
-.btn-delete-serie:hover {
-    background: #661111;
-}
-
-/* Botão +Série */
 .btn-add-serie { 
     width: 100%; 
     background: #333; 
-    color: white; 
-    border: 1px solid #444;
-    padding: 12px; 
-    border-radius: 10px; 
-    margin-top: 15px; 
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.btn-add-serie:hover {
-    background: #444;
-}
-
-/* Footer Fixo */
-.actions-footer { 
-    position: fixed; 
-    bottom: 0; 
-    left: 0; 
-    right: 0; 
-    background: rgba(18, 18, 18, 0.95); 
-    padding: 20px; 
-    display: flex; 
-    flex-direction: column; 
-    gap: 12px; 
-    border-top: 1px solid #333; 
-    backdrop-filter: blur(5px);
-    z-index: 100;
-}
-
-.btn-finalizar { 
-    background: #007bff; 
-    color: white; 
-    padding: 16px; 
-    border-radius: 12px; 
-    font-weight: 700; 
+    color: #eee; 
     border: none; 
-    font-size: 16px;
-    cursor: pointer;
+    padding: 10px; 
+    border-radius: 8px; 
+    margin-top: 10px;
+    font-weight: 600;
 }
 
-.btn-limpar { 
-    background: #2a2a2a; 
-    color: #ccc; 
-    padding: 12px; 
-    border-radius: 10px; 
-    border: 1px solid #444; 
-    font-size: 14px;
-    cursor: pointer;
+/* FOOTER */
+.actions-footer { 
+    position: fixed; bottom: 0; left: 0; right: 0; 
+    background: #121212; padding: 15px; 
+    display: flex; flex-direction: column; gap: 10px; 
+    border-top: 1px solid #333;
 }
+
+.btn-finalizar { background: #007bff; color: white; padding: 15px; border-radius: 10px; font-weight: 700; border: none; font-size: 16px; }
+.btn-limpar { background: #222; color: #888; padding: 10px; border-radius: 8px; border: none; font-size: 13px; }
