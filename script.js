@@ -58,7 +58,7 @@ function renderizarTreino(tipo) {
         const sCont = document.getElementById(`series-container-${idx}`);
         const antEx = anterior[idx];
         
-        if (antEx && antEx.series && antEx.series.length > 0) {
+        if (antEx && antEx.series) {
             antEx.series.forEach(s => {
                 sCont.appendChild(criarElementoSerie('', '', '', s.peso, s.reps, s.nota, s.isWorkSet, s.isMR));
             });
@@ -134,7 +134,7 @@ function carregarProgresso(tipo) {
     if (!salvo) return;
     const cards = document.querySelectorAll('.card-exercicio');
     cards.forEach((card, idx) => {
-        if (salvo[idx] && salvo[idx].series && salvo[idx].series.length > 0) {
+        if (salvo[idx] && salvo[idx].series) {
             const sCont = card.querySelector(`[id^="series-container"]`);
             if(sCont){
                 sCont.innerHTML = '';
@@ -150,14 +150,12 @@ function exportarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const dataAtual = new Date().toLocaleDateString('pt-BR');
-    
     let volumeTotalGeral = 0; 
     let y = 40;
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
     doc.text(`Relatório: ${seletor.selectedOptions[0].text}`, 10, 20);
-    
     doc.setFontSize(12);
     doc.setFont("helvetica", "normal");
     doc.text(`Data: ${dataAtual}`, 10, 28);
@@ -169,8 +167,7 @@ function exportarPDF() {
         
         let temConteudo = false;
         rows.forEach(row => {
-            const pField = row.querySelector('.peso-input');
-            if(pField.value || (pField.placeholder && pField.placeholder !== "Peso")) temConteudo = true;
+            if(row.querySelector('.peso-input').value || row.querySelector('.peso-input').placeholder !== "Peso") temConteudo = true;
         });
 
         if(!temConteudo) return;
@@ -180,37 +177,28 @@ function exportarPDF() {
         doc.setFontSize(14);
         doc.text(nomeEx, 10, y); y += 8;
         
-        doc.setFont("helvetica", "normal");
         doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
 
         rows.forEach((row, i) => {
-            const pField = row.querySelector('.peso-input');
-            const rField = row.querySelector('.reps-input');
-            const nField = row.querySelector('.nota-input');
             const isMR = row.querySelector('.mr-check').checked;
             const isWS = row.querySelector('.ws-check').checked;
+            const pVal = row.querySelector('.peso-input').value || row.querySelector('.peso-input').placeholder;
+            const rVal = row.querySelector('.reps-input').value || row.querySelector('.reps-input').placeholder;
+            const obs = row.querySelector('.nota-input').value;
 
-            let pVal = pField.value || pField.placeholder || "0";
-            let rVal = rField.value || rField.placeholder || "0";
-            const obs = nField.value;
-
-            let pNum = parseFloat(pVal.toString().replace(/[^0-9.]/g, '')) || 0;
-            let rNum = isMR ? 24 : (parseInt(rVal.toString().replace(/[^0-9]/g, '')) || 0);
-
+            let pNum = parseFloat(pVal.toString().replace(/[^\d.]/g, '')) || 0;
+            let rNum = isMR ? 24 : (parseInt(rVal.toString().replace(/[^\d]/g, '')) || 0);
             volumeTotalGeral += (pNum * rNum);
 
             const status = isMR ? "[MR]" : (isWS ? "[WS]" : "[  ]");
             const repsTexto = isMR ? "24 reps (6x4)" : `${rNum} reps`;
             
-            if(y > 280) { doc.addPage(); y = 20; }
             doc.text(`${status} Set ${i+1}: ${pNum}kg x ${repsTexto}`, 15, y);
             y += 6;
-
-            if (obs && obs.trim() !== "") {
+            if(obs) {
                 doc.setFont("helvetica", "italic");
-                doc.setTextColor(100, 100, 100);
                 doc.text(`   Obs: ${obs}`, 15, y);
-                doc.setTextColor(0, 0, 0);
                 doc.setFont("helvetica", "normal");
                 y += 6;
             }
@@ -219,9 +207,7 @@ function exportarPDF() {
     });
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(15);
     doc.text(`VOLUME TOTAL: ${volumeTotalGeral.toLocaleString('pt-BR')} kg`, 10, y + 10);
-    
     doc.save(`Treino_${seletor.value}_${dataAtual.replace(/\//g,'-')}.pdf`);
 
     localStorage.setItem(`treino_anterior_${seletor.value}`, localStorage.getItem(`treino_atual_${seletor.value}`));
