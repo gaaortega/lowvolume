@@ -181,7 +181,12 @@ function exportarPDF() {
     document.querySelectorAll('.card-exercicio').forEach(card => {
         const nomeEx = card.querySelector('h3').innerText;
         const rows = card.querySelectorAll('.serie-row');
-        let temDados = Array.from(rows).some(r => r.querySelectorAll('input')[0].value || r.querySelectorAll('input')[1].value);
+        
+        // Verifica se há algo digitado em qualquer input de número desta linha
+        let temDados = Array.from(rows).some(r => {
+            const ins = r.querySelectorAll('input[type="number"]');
+            return ins[0].value !== "" || ins[1].value !== "";
+        });
 
         if (temDados) {
             doc.setFont("helvetica", "bold");
@@ -190,27 +195,32 @@ function exportarPDF() {
             doc.setFont("helvetica", "normal");
 
             rows.forEach((row, i) => {
-                const inputs = row.querySelectorAll('input[type="number"], input[type="text"]');
+                const inputs = row.querySelectorAll('input');
                 const isWS = row.querySelector('.ws-check').checked;
                 const isMR = row.querySelector('.mr-check').checked;
 
-                // Captura o valor bruto do input ou do placeholder
-                let pRaw = inputs[0].value || inputs[0].getAttribute('placeholder') || '0';
-                let rRaw = inputs[1].value || inputs[1].getAttribute('placeholder') || '0';
+                // Captura valor ou placeholder
+                let pVal = inputs[2].value; // Input de peso
+                let rVal = inputs[3].value; // Input de reps
+                
+                let pPlac = inputs[2].getAttribute('placeholder') || "0";
+                let rPlac = inputs[3].getAttribute('placeholder') || "0";
 
-                // LIMPEZA: Remove 'kg' e qualquer espaço, garantindo que vire um número puro
-                const pFinalNum = parseFloat(pRaw.toString().replace(/[^0-9.]/g, '')) || 0;
-                const rFinalNum = parseInt(rRaw.toString().replace(/[^0-9]/g, '')) || 0;
+                // Se o input estiver vazio, usa o placeholder
+                let pFinalStr = pVal !== "" ? pVal : pPlac;
+                let rFinalStr = rVal !== "" ? rVal : rPlac;
 
-                const n = inputs[2].value || '-';
+                // Limpeza agressiva: remove TUDO que não for número ou ponto
+                const pClean = parseFloat(pFinalStr.toString().replace(/[^0-9.]/g, '')) || 0;
+                const rClean = parseInt(rFinalStr.toString().replace(/[^0-9]/g, '')) || 0;
 
-                // Cálculo de Volume usando os números limpos
-                volumeTotal += (pFinalNum * rFinalNum);
+                const n = inputs[4].value || '-';
+
+                // Soma ao volume
+                volumeTotal += (pClean * rClean);
 
                 const status = isMR ? "[MR]" : (isWS ? "[WS]" : "[  ]");
-                
-                // No texto do PDF, usamos os números limpos para garantir a formatação
-                doc.text(`${status} Set ${i+1}: ${pFinalNum}kg x ${rFinalNum} reps | Obs: ${n}`, 15, y);
+                doc.text(`${status} Set ${i+1}: ${pClean}kg x ${rClean} reps | Obs: ${n}`, 15, y);
                 
                 y += 6;
                 if (y > 280) { doc.addPage(); y = 20; }
@@ -221,15 +231,16 @@ function exportarPDF() {
 
     y += 10;
     doc.setFont("helvetica", "bold");
-    doc.text(`VOLUME TOTAL: ${volumeTotal.toLocaleString()} kg`, 10, y);
+    doc.text(`VOLUME TOTAL: ${volumeTotal.toLocaleString('pt-BR')} kg`, 10, y);
     doc.save(`Treino_${tipo}_${dataStr.replace(/\//g,'-')}.pdf`);
 
-    // Rotacionar histórico
+    // Histórico e Reset
     const atual = localStorage.getItem(`treino_atual_${tipo}`);
     if (atual) {
         localStorage.setItem(`treino_anterior_${tipo}`, atual);
         localStorage.removeItem(`treino_atual_${tipo}`);
     }
+    alert("PDF Gerado! O volume total foi de " + volumeTotal.toLocaleString('pt-BR') + " kg");
     renderizarTreino(tipo);
 }
 
