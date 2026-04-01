@@ -41,6 +41,41 @@ const container = document.getElementById('lista-exercicios');
 const seletor = document.getElementById('select-treino');
 
 // 2. FUNÇÃO QUE DESENHA OS EXERCÍCIOS NA TELA
+function criarElementoSerie(peso = '', reps = '', nota = '', pesoAnt = '', repsAnt = '', notaAnt = '', isWorkSet = false, isMR = false) {
+    const div = document.createElement('div');
+    div.className = 'serie-row';
+    
+    const pPlaceholder = pesoAnt ? `${pesoAnt} kg` : "Peso";
+    const rPlaceholder = repsAnt ? `${repsAnt}` : "Reps";
+    const nPlaceholder = notaAnt ? `${notaAnt}` : "Nota da série";
+
+    div.innerHTML = `
+        <div class="serie-controls">
+            <label class="check-container ws-label">
+                <input type="checkbox" class="ws-check" ${isWorkSet ? 'checked' : ''} onchange="salvarProgresso()">
+                <span>WS</span>
+            </label>
+            <label class="check-container mr-label">
+                <input type="checkbox" class="mr-check" ${isMR ? 'checked' : ''} onchange="salvarProgresso()">
+                <span>MR</span>
+            </label>
+        </div>
+        <input type="number" placeholder="${pPlaceholder}" value="${peso}" oninput="salvarProgresso()" class="peso-input">
+        <input type="number" placeholder="${rPlaceholder}" value="${reps}" oninput="salvarProgresso()" class="reps-input">
+        <input type="text" placeholder="${nPlaceholder}" value="${nota}" oninput="salvarProgresso()" class="nota-input">
+        <button class="btn-delete-serie" onclick="removerSerie(this)">×</button>
+    `;
+    return div;
+}
+
+// Função para remover a série específica
+function removerSerie(botao) {
+    if (confirm("Deseja excluir esta série?")) {
+        botao.parentElement.remove();
+        salvarProgresso();
+    }
+}
+
 function renderizarTreino(tipo) {
     container.innerHTML = ''; // Limpa a tela antes de desenhar
     const treino = exerciciosData[tipo];
@@ -122,19 +157,30 @@ function salvarProgresso() {
         const nome = card.querySelector('h3').innerText;
         const series = [];
         card.querySelectorAll('.serie-row').forEach(row => {
-            const inputs = row.querySelectorAll('input');
-            const wsCheck = row.querySelector('input[type="checkbox"]').checked; // Lê o check
+            const wsCheck = row.querySelector('.ws-check').checked;
+            const mrCheck = row.querySelector('.mr-check').checked;
+            const inputs = row.querySelectorAll('input[type="number"], input[type="text"]');
+            
             series.push({
-                peso: inputs[1].value, // Índice mudou pq adicionamos o check antes
-                reps: inputs[2].value,
-                nota: inputs[3].value,
-                isWorkSet: wsCheck // Salva o estado
+                peso: inputs[0].value,
+                reps: inputs[1].value,
+                nota: inputs[2].value,
+                isWorkSet: wsCheck,
+                isMR: mrCheck
             });
         });
         dadosParaSalvar.push({ nome, series });
     });
 
     localStorage.setItem(`treino_atual_${seletor.value}`, JSON.stringify(dadosParaSalvar));
+}
+
+function limparTreinoAtual() {
+    if (confirm("Deseja limpar todos os pesos digitados hoje? Isso não apagará o histórico (fantasmas).")) {
+        const tipo = seletor.value;
+        localStorage.removeItem(`treino_atual_${tipo}`);
+        renderizarTreino(tipo);
+    }
 }
 
 // 6. CARREGAR PROGRESSO ATUAL (Ajustado para não dar erro se estiver em branco)
@@ -183,71 +229,60 @@ function exportarPDF() {
     const dataAtual = new Date().toLocaleDateString('pt-BR');
     const treinoNome = seletor.selectedOptions[0].text;
     const tipo = seletor.value;
+    let volumeTotalTreino = 0;
 
-    // Cabeçalho
-    doc.setFontSize(18);
-    doc.text(`Relatório de Treino: ${treinoNome}`, 10, 20);
-    doc.setFontSize(12);
-    doc.text(`Data: ${dataAtual}`, 10, 30);
-    doc.line(10, 35, 200, 35);
-
-    let y = 45;
-    const cards = document.querySelectorAll('.card-exercicio');
+    // Cabeçalho ... (mesmo código anterior) ...
 
     cards.forEach((card) => {
         const nomeEx = card.querySelector('h3').innerText;
         const seriesRows = card.querySelectorAll('.serie-row');
-        
-        // Verifica se houve alguma atividade nesse exercício
         let temConteudo = false;
+
+        // Primeiro passamos para verificar conteúdo e calcular volume do exercício
         seriesRows.forEach(row => {
-            const inputs = row.querySelectorAll('input');
-            if (inputs[1].value || inputs[2].value) temConteudo = true;
+            const inputs = row.querySelectorAll('input[type="number"]');
+            if (inputs[0].value || inputs[1].value) temConteudo = true;
         });
 
         if (temConteudo) {
-            // --- ESTA É A LINHA QUE FALTAVA: ESCREVER O NOME DO EXERCÍCIO ---
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(13);
             doc.text(nomeEx.toUpperCase(), 10, y);
-            y += 8; // Pula linha após o título
+            y += 8;
 
             doc.setFont("helvetica", "normal");
-            doc.setFontSize(11);
-
             seriesRows.forEach((serie, index) => {
-                const checkbox = serie.querySelector('input[type="checkbox"]');
-                const inputs = serie.querySelectorAll('input');
+                const isWS = serie.querySelector('.ws-check').checked;
+                const isMR = serie.querySelector('.mr-check').checked;
+                const inputs = serie.querySelectorAll('input[type="number"], input[type="text"]');
 
-                // Lógica de Valor Real ou Placeholder (Fantasma)
-                const pReal = inputs[1].value;
-                const pPlaceholder = inputs[1].getAttribute('placeholder').replace('kg', '').trim();
-                const pFinal = pReal || pPlaceholder || '0';
+                const pFinal = inputs[0].value || inputs[0].getAttribute('placeholder').replace('kg', '').trim() || '0';
+                const rFinal = inputs[1].value || inputs[1].getAttribute('placeholder').trim() || '0';
+                const nota = inputs[2].value || '-';
 
-                const rReal = inputs[2].value;
-                const rPlaceholder = inputs[2].getAttribute('placeholder').trim();
-                const rFinal = rReal || rPlaceholder || '0';
+                // Cálculo de Volume
+                volumeTotalTreino += (parseFloat(pFinal) * parseInt(rFinal));
 
-                const nota = inputs[3].value || '-';
-                const wsStatus = checkbox.checked ? "[WS]" : "[  ]";
-
-                // Formatação da linha
-                const textoLinha = `${wsStatus} Set ${index + 1}: ${pFinal} kg x ${rFinal} reps | Obs: ${nota}`;
+                const prefixo = isMR ? "[MR]" : (isWS ? "[WS]" : "[  ]");
+                const textoLinha = `${prefixo} Set ${index + 1}: ${pFinal} kg x ${rFinal} reps | Obs: ${nota}`;
                 
                 doc.text(textoLinha, 15, y);
                 y += 7;
-
-                if (y > 275) { 
-                    doc.addPage(); 
-                    y = 20; 
-                }
+                if (y > 270) { doc.addPage(); y = 20; }
             });
-
-            y += 6; // Espaço extra entre o fim de um exercício e o começo do próximo
+            y += 5;
         }
     });
 
+    // Rodapé com Volume Total
+    y += 10;
+    doc.setFont("helvetica", "bold");
+    doc.line(10, y, 200, y);
+    y += 10;
+    doc.text(`VOLUME TOTAL DO TREINO: ${volumeTotalTreino.toLocaleString()} kg`, 10, y);
+
     doc.save(`Treino_${tipo}_${dataAtual.replace(/\//g, '-')}.pdf`);
+    
+    // Lógica de salvar histórico e limpar atual ... (mesmo código) ...
 
     // Mógica de salvar para o histórico "Fantasma"
     const dadosAtuais = localStorage.getItem(`treino_atual_${tipo}`);
