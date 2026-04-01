@@ -60,7 +60,6 @@ function renderizarTreino(tipo) {
         
         if (antEx && antEx.series && antEx.series.length > 0) {
             antEx.series.forEach(s => {
-                // Ao carregar do anterior, limpamos os valores atuais para não misturar (o erro da Imagem 2)
                 sCont.appendChild(criarElementoSerie('', '', '', s.peso, s.reps, s.nota, s.isWorkSet, s.isMR));
             });
         } else {
@@ -70,35 +69,32 @@ function renderizarTreino(tipo) {
     carregarProgresso(tipo);
 }
 
-// FUNÇÃO ATUALIZADA: Novo HTML para bater com o layout da Imagem 3
 function criarElementoSerie(peso='', reps='', nota='', pAnt='', rAnt='', nAnt='', isWS=false, isMR=false) {
     const div = document.createElement('div');
     div.className = 'serie-row';
     
-    // Fallback seguro para placeholders, removendo 'kg' se existir
     const pPlaceholder = pAnt ? pAnt.toString().replace(/kg/gi, '').trim() : "Peso";
     const rPlaceholder = rAnt || "Reps";
 
     div.innerHTML = `
         <div class="serie-main-controls">
             <div class="serie-checks-group">
-                <label class="check-container mr-label">
-                    <input type="checkbox" class="mr-check" ${isMR?'checked':''} onchange="salvarProgresso()">
-                    <span>MR</span>
-                </label>
                 <label class="check-container ws-label">
                     <input type="checkbox" class="ws-check" ${isWS?'checked':''} onchange="salvarProgresso()">
                     <span>WS</span>
                 </label>
+                <label class="check-container mr-label">
+                    <input type="checkbox" class="mr-check" ${isMR?'checked':''} onchange="salvarProgresso()">
+                    <span>MR</span>
+                </label>
             </div>
-            
             <input type="number" class="peso-input" placeholder="${pPlaceholder}" value="${peso}" oninput="salvarProgresso()" inputmode="decimal">
             <input type="number" class="reps-input" placeholder="${rPlaceholder}" value="${reps}" oninput="salvarProgresso()" inputmode="numeric">
-            
+        </div>
+        <div class="serie-second-row">
+            <input type="text" class="nota-input" placeholder="${nAnt||'Nota'}" value="${nota}" oninput="salvarProgresso()">
             <button class="btn-delete-serie" onclick="removerSerie(this)">×</button>
         </div>
-        
-        <input type="text" class="nota-input" placeholder="${nAnt||'Nota'}" value="${nota}" oninput="salvarProgresso()">
     `;
     return div;
 }
@@ -150,21 +146,16 @@ function carregarProgresso(tipo) {
     });
 }
 
-// PDF ATUALIZADO: Nota embaixo da série, fonte melhorada
 function exportarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const dataAtual = new Date().toLocaleDateString('pt-BR');
     
-    // Fontes base do jsPDF (não arredondadas, mas mais limpas)
-    doc.setFont("helvetica", "normal");
-    
     let volumeTotalGeral = 0; 
     let y = 40;
 
-    // Cabeçalho
-    doc.setFontSize(18);
     doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
     doc.text(`Relatório: ${seletor.selectedOptions[0].text}`, 10, 20);
     
     doc.setFontSize(12);
@@ -176,82 +167,63 @@ function exportarPDF() {
         const nomeEx = card.querySelector('h3').innerText;
         const rows = card.querySelectorAll('.serie-row');
         
-        // Verifica se há dados antes de imprimir o nome do exercício
         let temConteudo = false;
         rows.forEach(row => {
             const pField = row.querySelector('.peso-input');
             if(pField.value || (pField.placeholder && pField.placeholder !== "Peso")) temConteudo = true;
         });
 
-        if(!temConteudo) return; // Pula exercício vazio
+        if(!temConteudo) return;
 
-        doc.setFontSize(14);
-        doc.setFont("helvetica", "bold");
         if(y > 260) { doc.addPage(); y = 20; }
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
         doc.text(nomeEx, 10, y); y += 8;
         
-        doc.setFontSize(11);
         doc.setFont("helvetica", "normal");
+        doc.setFontSize(11);
 
         rows.forEach((row, i) => {
             const pField = row.querySelector('.peso-input');
             const rField = row.querySelector('.reps-input');
-            const nField = row.querySelector('.nota-input'); // Campo Nota
+            const nField = row.querySelector('.nota-input');
             const isMR = row.querySelector('.mr-check').checked;
             const isWS = row.querySelector('.ws-check').checked;
 
-            // Lógica blindada: Prioridade total para o valor digitado (.value)
             let pVal = pField.value || pField.placeholder || "0";
             let rVal = rField.value || rField.placeholder || "0";
-            const obs = nField.value; // Valor da Nota
+            const obs = nField.value;
 
-            // Limpeza absoluta de caracteres não numéricos
             let pNum = parseFloat(pVal.toString().replace(/[^0-9.]/g, '')) || 0;
-            let rNum = parseInt(rVal.toString().replace(/[^0-9]/g, '')) || 0;
+            let rNum = isMR ? 24 : (parseInt(rVal.toString().replace(/[^0-9]/g, '')) || 0);
 
-            // REGRA DO MUSCLE ROUND automática
-            if (isMR) { rNum = 24; }
+            volumeTotalGeral += (pNum * rNum);
 
-            // Cálculo do volume (sempre kg * reps)
-            let volSerie = pNum * rNum;
-            volumeTotalGeral += volSerie;
-
-            // Status Prefix
             const status = isMR ? "[MR]" : (isWS ? "[WS]" : "[  ]");
             const repsTexto = isMR ? "24 reps (6x4)" : `${rNum} reps`;
             
-            // Verificação de quebra de página antes de imprimir a série completa
-            let espacoNecessario = obs ? 12 : 6;
-            if(y > (285 - espacoNecessario)) { doc.addPage(); y = 20; }
-
-            // Imprime a linha da Série
+            if(y > 280) { doc.addPage(); y = 20; }
             doc.text(`${status} Set ${i+1}: ${pNum}kg x ${repsTexto}`, 15, y);
             y += 6;
 
-            // AJUSTE: Imprime a Nota (Obs) embaixo da série, se existir
             if (obs && obs.trim() !== "") {
                 doc.setFont("helvetica", "italic");
-                doc.setTextColor(100, 100, 100); // Cinza para a nota
+                doc.setTextColor(100, 100, 100);
                 doc.text(`   Obs: ${obs}`, 15, y);
-                doc.setTextColor(0, 0, 0); // Volta pro preto
+                doc.setTextColor(0, 0, 0);
                 doc.setFont("helvetica", "normal");
                 y += 6;
             }
         });
-        y += 6; // Espaço entre exercícios
+        y += 6;
     });
 
-    // Resultado Final
-    if(y > 270) { doc.addPage(); y = 20; }
-    y += 5;
-    doc.line(10, y-5, 200, y-5);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(15);
-    doc.text(`VOLUME TOTAL: ${volumeTotalGeral.toLocaleString('pt-BR')} kg`, 10, y + 5);
+    doc.text(`VOLUME TOTAL: ${volumeTotalGeral.toLocaleString('pt-BR')} kg`, 10, y + 10);
     
     doc.save(`Treino_${seletor.value}_${dataAtual.replace(/\//g,'-')}.pdf`);
 
-    // Backup e Reset
     localStorage.setItem(`treino_anterior_${seletor.value}`, localStorage.getItem(`treino_atual_${seletor.value}`));
     localStorage.removeItem(`treino_atual_${seletor.value}`);
     renderizarTreino(seletor.value);
