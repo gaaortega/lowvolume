@@ -57,8 +57,11 @@ function renderizarTreino(tipo) {
         
         const sCont = document.getElementById(`series-container-${idx}`);
         const antEx = anterior[idx];
+        
         if (antEx && antEx.series && antEx.series.length > 0) {
-            antEx.series.forEach(s => sCont.appendChild(criarElementoSerie('', '', '', s.peso, s.reps, s.nota, s.isWorkSet, s.isMR)));
+            antEx.series.forEach(s => {
+                sCont.appendChild(criarElementoSerie('', '', '', s.peso, s.reps, s.nota, s.isWorkSet, s.isMR));
+            });
         } else {
             sCont.appendChild(criarElementoSerie());
         }
@@ -69,7 +72,7 @@ function renderizarTreino(tipo) {
 function criarElementoSerie(peso='', reps='', nota='', pAnt='', rAnt='', nAnt='', isWS=false, isMR=false) {
     const div = document.createElement('div');
     div.className = 'serie-row';
-    const pPlaceholder = pAnt ? pAnt : "0";
+    const pPlaceholder = pAnt ? pAnt.toString().replace('kg','') : "0";
     const rPlaceholder = rAnt ? rAnt : "0";
 
     div.innerHTML = `
@@ -122,7 +125,7 @@ function carregarProgresso(tipo) {
     cards.forEach((card, idx) => {
         if (salvo[idx] && salvo[idx].series) {
             const sCont = card.querySelector(`[id^="series-container"]`);
-            if (sCont) {
+            if(sCont){
                 sCont.innerHTML = '';
                 salvo[idx].series.forEach(s => {
                     sCont.appendChild(criarElementoSerie(s.peso, s.reps, s.nota, '', '', '', s.isWorkSet, s.isMR));
@@ -136,7 +139,8 @@ function exportarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const dataAtual = new Date().toLocaleDateString('pt-BR');
-    let volumeTotalGeral = 0;
+    
+    let volumeTotalGeral = 0; // REINICIANDO DO ZERO
     let y = 40;
 
     doc.setFontSize(16);
@@ -146,24 +150,24 @@ function exportarPDF() {
     doc.line(10, 32, 200, 32);
 
     document.querySelectorAll('.card-exercicio').forEach(card => {
-        const nome = card.querySelector('h3').innerText;
+        const nomeEx = card.querySelector('h3').innerText;
         const rows = card.querySelectorAll('.serie-row');
         
         doc.setFont("helvetica", "bold");
-        doc.text(nome, 10, y); y += 7;
+        doc.text(nomeEx, 10, y); y += 7;
         doc.setFont("helvetica", "normal");
 
         rows.forEach((row, i) => {
-            const pInp = row.querySelector('.peso-input');
-            const rInp = row.querySelector('.reps-input');
-            
-            // Pega o valor real ou o cinza (placeholder)
-            let pTexto = pInp.value || pInp.placeholder || "0";
-            let rTexto = rInp.value || rInp.placeholder || "0";
+            const pField = row.querySelector('.peso-input');
+            const rField = row.querySelector('.reps-input');
 
-            // Limpa qualquer texto (tira o 'kg' se existir)
-            let pNum = parseFloat(pTexto.toString().replace(/[^0-9.]/g, '')) || 0;
-            let rNum = parseInt(rTexto.toString().replace(/[^0-9]/g, '')) || 0;
+            // Pega o valor real ou o placeholder cinza
+            let pTxt = pField.value || pField.placeholder || "0";
+            let rTxt = rField.value || rField.placeholder || "0";
+
+            // Limpa qualquer 'kg' e converte para número
+            let pNum = parseFloat(pTxt.toString().replace(/[^0-9.]/g, '')) || 0;
+            let rNum = parseInt(rTxt.toString().replace(/[^0-9]/g, '')) || 0;
 
             volumeTotalGeral += (pNum * rNum);
 
@@ -182,17 +186,15 @@ function exportarPDF() {
     doc.text(`VOLUME TOTAL: ${volumeTotalGeral.toLocaleString('pt-BR')} kg`, 10, y + 10);
     
     doc.save(`Treino_${dataAtual.replace(/\//g,'-')}.pdf`);
-    
-    // Alerta para você confirmar na hora se bateu o valor
-    alert("Volume Total Calculado: " + volumeTotalGeral + " kg");
 
+    // Resetando para o próximo treino
     localStorage.setItem(`treino_anterior_${seletor.value}`, localStorage.getItem(`treino_atual_${seletor.value}`));
     localStorage.removeItem(`treino_atual_${seletor.value}`);
     renderizarTreino(seletor.value);
 }
 
 function limparTreinoAtual() {
-    if(confirm("Limpar treino de hoje?")){
+    if(confirm("Limpar treino atual?")){
         localStorage.removeItem(`treino_atual_${seletor.value}`);
         renderizarTreino(seletor.value);
     }
