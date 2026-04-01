@@ -171,56 +171,58 @@ function exportarPDF() {
     const dataStr = new Date().toLocaleDateString('pt-BR');
     let volumeTotal = 0;
 
+    // Cabeçalho do PDF
     doc.setFontSize(18);
-    doc.text(`Treino: ${seletor.selectedOptions[0].text}`, 10, 20);
+    doc.text(`Relatório de Treino: ${seletor.selectedOptions[0].text}`, 10, 20);
     doc.setFontSize(11);
     doc.text(`Data: ${dataStr}`, 10, 28);
     doc.line(10, 32, 200, 32);
 
     let y = 40;
-    document.querySelectorAll('.card-exercicio').forEach(card => {
+    const cards = document.querySelectorAll('.card-exercicio');
+
+    cards.forEach(card => {
         const nomeEx = card.querySelector('h3').innerText;
         const rows = card.querySelectorAll('.serie-row');
         
-        // Verifica se há algo digitado em qualquer input de número desta linha
-        let temDados = Array.from(rows).some(r => {
-            const ins = r.querySelectorAll('input[type="number"]');
-            return ins[0].value !== "" || ins[1].value !== "";
+        // Verifica se o exercício tem algum peso ou repetição preenchida (ou placeholder)
+        let temConteudo = false;
+        rows.forEach(row => {
+            const pInp = row.querySelector('.peso-input');
+            const rInp = row.querySelector('.reps-input');
+            if (pInp.value || rInp.value || pInp.placeholder !== "Peso") temConteudo = true;
         });
 
-        if (temDados) {
+        if (temConteudo) {
             doc.setFont("helvetica", "bold");
             doc.text(nomeEx.toUpperCase(), 10, y);
             y += 7;
             doc.setFont("helvetica", "normal");
 
             rows.forEach((row, i) => {
-                const inputs = row.querySelectorAll('input');
+                // Captura os elementos pelas CLASSES (mais seguro que índice)
+                const pInp = row.querySelector('.peso-input');
+                const rInp = row.querySelector('.reps-input');
+                const nInp = row.querySelector('.nota-input');
                 const isWS = row.querySelector('.ws-check').checked;
                 const isMR = row.querySelector('.mr-check').checked;
 
-                // Captura valor ou placeholder
-                let pVal = inputs[2].value; // Input de peso
-                let rVal = inputs[3].value; // Input de reps
-                
-                let pPlac = inputs[2].getAttribute('placeholder') || "0";
-                let rPlac = inputs[3].getAttribute('placeholder') || "0";
+                // Lógica de valor real vs placeholder
+                let pStr = pInp.value || pInp.getAttribute('placeholder') || "0";
+                let rStr = rInp.value || rInp.getAttribute('placeholder') || "0";
 
-                // Se o input estiver vazio, usa o placeholder
-                let pFinalStr = pVal !== "" ? pVal : pPlac;
-                let rFinalStr = rVal !== "" ? rVal : rPlac;
+                // Limpeza para garantir que vire número (remove "kg" e espaços)
+                const pNum = parseFloat(pStr.toString().replace(/[^0-9.]/g, '')) || 0;
+                const rNum = parseInt(rStr.toString().replace(/[^0-9]/g, '')) || 0;
+                const nota = nInp.value || '-';
 
-                // Limpeza agressiva: remove TUDO que não for número ou ponto
-                const pClean = parseFloat(pFinalStr.toString().replace(/[^0-9.]/g, '')) || 0;
-                const rClean = parseInt(rFinalStr.toString().replace(/[^0-9]/g, '')) || 0;
+                // CÁLCULO DO VOLUME (Soma todas as séries aqui)
+                const volumeSerie = pNum * rNum;
+                volumeTotal += volumeSerie;
 
-                const n = inputs[4].value || '-';
-
-                // Soma ao volume
-                volumeTotal += (pClean * rClean);
-
-                const status = isMR ? "[MR]" : (isWS ? "[WS]" : "[  ]");
-                doc.text(`${status} Set ${i+1}: ${pClean}kg x ${rClean} reps | Obs: ${n}`, 15, y);
+                // Formatação do prefixo
+                const prefixo = isMR ? "[MR]" : (isWS ? "[WS]" : "[  ]");
+                doc.text(`${prefixo} Set ${i+1}: ${pNum}kg x ${rNum} reps | Obs: ${nota}`, 15, y);
                 
                 y += 6;
                 if (y > 280) { doc.addPage(); y = 20; }
@@ -229,18 +231,23 @@ function exportarPDF() {
         }
     });
 
+    // Rodapé com o Volume Final
     y += 10;
     doc.setFont("helvetica", "bold");
-    doc.text(`VOLUME TOTAL: ${volumeTotal.toLocaleString('pt-BR')} kg`, 10, y);
+    doc.line(10, y-5, 200, y-5);
+    doc.text(`VOLUME TOTAL DO TREINO: ${volumeTotal.toLocaleString('pt-BR')} kg`, 10, y);
+
     doc.save(`Treino_${tipo}_${dataStr.replace(/\//g,'-')}.pdf`);
 
-    // Histórico e Reset
+    // Alerta de confirmação para você ver se o código novo rodou
+    console.log("Volume Total Calculado:", volumeTotal);
+    
+    // Salva o atual no anterior e limpa
     const atual = localStorage.getItem(`treino_atual_${tipo}`);
     if (atual) {
         localStorage.setItem(`treino_anterior_${tipo}`, atual);
         localStorage.removeItem(`treino_atual_${tipo}`);
     }
-    alert("PDF Gerado! O volume total foi de " + volumeTotal.toLocaleString('pt-BR') + " kg");
     renderizarTreino(tipo);
 }
 
