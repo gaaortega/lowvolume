@@ -140,11 +140,11 @@ function exportarPDF() {
     const doc = new jsPDF();
     const dataAtual = new Date().toLocaleDateString('pt-BR');
     
-    let volumeTotalGeral = 0; // REINICIANDO DO ZERO
+    let volumeTotalGeral = 0; 
     let y = 40;
 
     doc.setFontSize(16);
-    doc.text(`Treino: ${seletor.selectedOptions[0].text}`, 10, 20);
+    doc.text(`Relatório: ${seletor.selectedOptions[0].text}`, 10, 20);
     doc.setFontSize(11);
     doc.text(`Data: ${dataAtual}`, 10, 28);
     doc.line(10, 32, 200, 32);
@@ -160,22 +160,27 @@ function exportarPDF() {
         rows.forEach((row, i) => {
             const pField = row.querySelector('.peso-input');
             const rField = row.querySelector('.reps-input');
-
-            // Pega o valor real ou o placeholder cinza
-            let pTxt = pField.value || pField.placeholder || "0";
-            let rTxt = rField.value || rField.placeholder || "0";
-
-            // Limpa qualquer 'kg' e converte para número
-            let pNum = parseFloat(pTxt.toString().replace(/[^0-9.]/g, '')) || 0;
-            let rNum = parseInt(rTxt.toString().replace(/[^0-9]/g, '')) || 0;
-
-            volumeTotalGeral += (pNum * rNum);
-
             const isMR = row.querySelector('.mr-check').checked;
             const isWS = row.querySelector('.ws-check').checked;
+
+            let pVal = pField.value || pField.placeholder || "0";
+            let rVal = rField.value || rField.placeholder || "0";
+
+            let pNum = parseFloat(pVal.toString().replace(/[^0-9.]/g, '')) || 0;
+            let rNum = parseInt(rVal.toString().replace(/[^0-9]/g, '')) || 0;
+
+            // REGRA DO MUSCLE ROUND: Se MR estiver marcado, reps = 24
+            if (isMR) {
+                rNum = 24;
+            }
+
+            let volSerie = pNum * rNum;
+            volumeTotalGeral += volSerie;
+
             const status = isMR ? "[MR]" : (isWS ? "[WS]" : "[  ]");
+            const repsTexto = isMR ? "24 reps (6x4)" : `${rNum} reps`;
             
-            doc.text(`${status} Set ${i+1}: ${pNum}kg x ${rNum} reps`, 15, y);
+            doc.text(`${status} Set ${i+1}: ${pNum}kg x ${repsTexto}`, 15, y);
             y += 6;
             if(y > 275){ doc.addPage(); y = 20; }
         });
@@ -183,11 +188,11 @@ function exportarPDF() {
     });
 
     doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
     doc.text(`VOLUME TOTAL: ${volumeTotalGeral.toLocaleString('pt-BR')} kg`, 10, y + 10);
     
     doc.save(`Treino_${dataAtual.replace(/\//g,'-')}.pdf`);
 
-    // Resetando para o próximo treino
     localStorage.setItem(`treino_anterior_${seletor.value}`, localStorage.getItem(`treino_atual_${seletor.value}`));
     localStorage.removeItem(`treino_atual_${seletor.value}`);
     renderizarTreino(seletor.value);
