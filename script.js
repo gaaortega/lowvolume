@@ -1,38 +1,38 @@
 const exerciciosData = {
     "A": [
-        { nome: "SUPINO RETO", notaFixa: "<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
-        { nome: "SUPINO INCLINADO", notaFixa: "<br> 1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
-        { nome: "VOADOR", notaFixa: "<br> MUSCLE ROUND (CARGA PARA 12-15 REPS).<br>6 BLOCOS DE 4 REPS (10-15 SEG DESCANSO)" },
-        { nome: "DESENVOLVIMENTO", notaFixa: "<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>1 SÉRIE DE TRABALHO (5 A 9)" },
-        { nome: "ELEVAÇÃO LATERAL", notaFixa: "<br> 1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
-        { nome: "TRICEPS POLIA (BARRA)", notaFixa: "<br> 1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" }
+        { nome: "SUPINO RETO", notaFixa: "1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
+        { nome: "SUPINO INCLINADO", notaFixa: "1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
+        { nome: "VOADOR", notaFixa: "MUSCLE ROUND (CARGA PARA 12-15 REPS).<br>6 BLOCOS DE 4 REPS (10-15 SEG DESCANSO)" },
+        { nome: "DESENVOLVIMENTO", notaFixa: "1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>1 SÉRIE DE TRABALHO (5 A 9)" },
+        { nome: "ELEVAÇÃO LATERAL", notaFixa: "1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
+        { nome: "TRICEPS POLIA (BARRA)", notaFixa: "1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" }
     ],
     "B": [
-        { nome: "PUXADA ALTA", notaFixa: "<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
-        { nome: "REMADA BAIXA UNILATERAL", notaFixa: "<br> 1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
-        { nome: "PULLDOWN", notaFixa: "<br> MUSCLE ROUND (CARGA PARA 12-15 REPS).<br>6 BLOCOS DE 4 REPS (10-15 SEG DESCANSO)" },
-        { nome: "ROSCA SCOTT", notaFixa: "<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
-        { nome: "ROSCA BANCO 45", notaFixa: "<br> 1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" }
+        { nome: "PUXADA ALTA", notaFixa: "1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
+        { nome: "REMADA BAIXA UNILATERAL", notaFixa: "1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
+        { nome: "PULLDOWN", notaFixa: "MUSCLE ROUND (CARGA PARA 12-15 REPS).<br>6 BLOCOS DE 4 REPS (10-15 SEG DESCANSO)" },
+        { nome: "ROSCA SCOTT", notaFixa: "1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
+        { nome: "ROSCA BANCO 45", notaFixa: "1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" }
     ],
     "C": [
-        { nome: "MESA FLEXORA", notaFixa: "<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
-        { nome: "AGACHAMENTO PÊNDULO", notaFixa: "<br> 1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
-        { nome: "CADEIRA EXTENSORA", notaFixa: "<br> 1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
-        { nome: "PANTURRILHA", notaFixa: "<br> 1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" }
+        { nome: "MESA FLEXORA", notaFixa: "1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
+        { nome: "AGACHAMENTO PÊNDULO", notaFixa: "1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
+        { nome: "CADEIRA EXTENSORA", notaFixa: "1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
+        { nome: "PANTURRILHA", notaFixa: "1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" }
     ],
     "D": [
-        { nome: "SUPINO DECLINADO", notaFixa: "<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
-        { nome: "REMADA BAIXO TRIANGULO", notaFixa: "<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
-        { nome: "ELEVAÇÃO LATERAL", notaFixa: "<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
-        { nome: "TRICEPS CORDA", notaFixa: "<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
-        { nome: "ROSCA MARTELO", notaFixa: "<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" }
+        { nome: "SUPINO DECLINADO", notaFixa: "1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
+        { nome: "REMADA BAIXO TRIANGULO", notaFixa: "1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
+        { nome: "ELEVAÇÃO LATERAL", notaFixa: "1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
+        { nome: "TRICEPS CORDA", notaFixa: "1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
+        { nome: "ROSCA MARTELO", notaFixa: "1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" }
     ],
     "E": [
-        { nome: "MESA FLEXORA", notaFixa: "<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>1 SÉRIE DE TRABALHO (5 A 9)" },
-        { nome: "LEG PRESS 45", notaFixa: "<br> 1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
-        { nome: "ADUTORA", notaFixa: "<br> 1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
-        { nome: "ABDUTORA", notaFixa: "<br> 1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
-        { nome: "CADEIRA EXTENSORA UNILATERAL", notaFixa: "<br> 1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" }
+        { nome: "MESA FLEXORA", notaFixa: "1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>1 SÉRIE DE TRABALHO (5 A 9)" },
+        { nome: "LEG PRESS 45", notaFixa: "1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
+        { nome: "ADUTORA", notaFixa: "1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
+        { nome: "ABDUTORA", notaFixa: "1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
+        { nome: "CADEIRA EXTENSORA UNILATERAL", notaFixa: "1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" }
     ]
 };
 
@@ -134,7 +134,7 @@ function exportarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     const dataAtual = new Date().toLocaleDateString('pt-BR');
-    let volumeTotal = 0;
+    let volumeTotalGeral = 0;
     let y = 40;
 
     doc.setFontSize(16);
@@ -148,28 +148,31 @@ function exportarPDF() {
         const rows = card.querySelectorAll('.serie-row');
         
         doc.setFont("helvetica", "bold");
-        doc.text(nome, 10, y); y += 7;
+        doc.text(nome.toUpperCase(), 10, y); y += 7;
         doc.setFont("helvetica", "normal");
 
         rows.forEach((row, i) => {
             const pInp = row.querySelector('.peso-input');
             const rInp = row.querySelector('.reps-input');
+            const nInp = row.querySelector('.nota-input');
             
-            // Pega o que foi digitado ou o placeholder (fantasma)
+            // Lógica: pega o valor digitado. Se não houver, pega o placeholder.
             let pStr = pInp.value || pInp.getAttribute('placeholder') || "0";
             let rStr = rInp.value || rInp.getAttribute('placeholder') || "0";
 
-            // Limpeza real para garantir que vire número
+            // Limpeza: remove 'kg', espaços ou qualquer texto, sobrando apenas números e ponto
             let pNum = parseFloat(pStr.toString().replace(/[^0-9.]/g, '')) || 0;
             let rNum = parseInt(rStr.toString().replace(/[^0-9]/g, '')) || 0;
 
-            volumeTotal += (pNum * rNum);
+            const volumeSerie = pNum * rNum;
+            volumeTotalGeral += volumeSerie;
 
             const isMR = row.querySelector('.mr-check').checked;
             const isWS = row.querySelector('.ws-check').checked;
             const status = isMR ? "[MR]" : (isWS ? "[WS]" : "[  ]");
+            const obs = nInp.value || "-";
             
-            doc.text(`${status} Set ${i+1}: ${pNum}kg x ${rNum} reps`, 15, y);
+            doc.text(`${status} Set ${i+1}: ${pNum}kg x ${rNum} reps | Obs: ${obs}`, 15, y);
             y += 6;
             if(y > 275){ doc.addPage(); y = 20; }
         });
@@ -177,11 +180,11 @@ function exportarPDF() {
     });
 
     doc.setFont("helvetica", "bold");
-    doc.text(`VOLUME TOTAL: ${volumeTotal.toLocaleString('pt-BR')} kg`, 10, y + 10);
+    doc.text(`VOLUME TOTAL DO TREINO: ${volumeTotalGeral.toLocaleString('pt-BR')} kg`, 10, y + 10);
     
     doc.save(`Treino_${dataAtual.replace(/\//g,'-')}.pdf`);
     
-    // Backup e Reset
+    // Rotacionar para histórico
     localStorage.setItem(`treino_anterior_${seletor.value}`, localStorage.getItem(`treino_atual_${seletor.value}`));
     localStorage.removeItem(`treino_atual_${seletor.value}`);
     renderizarTreino(seletor.value);
