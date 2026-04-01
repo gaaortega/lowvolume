@@ -194,13 +194,24 @@ function exportarPDF() {
                 const isWS = row.querySelector('.ws-check').checked;
                 const isMR = row.querySelector('.mr-check').checked;
 
-                const p = inputs[0].value || inputs[0].getAttribute('placeholder').replace('kg','').trim() || '0';
-                const r = inputs[1].value || inputs[1].getAttribute('placeholder').trim() || '0';
+                // Captura o valor bruto do input ou do placeholder
+                let pRaw = inputs[0].value || inputs[0].getAttribute('placeholder') || '0';
+                let rRaw = inputs[1].value || inputs[1].getAttribute('placeholder') || '0';
+
+                // LIMPEZA: Remove 'kg' e qualquer espaço, garantindo que vire um número puro
+                const pFinalNum = parseFloat(pRaw.toString().replace(/[^0-9.]/g, '')) || 0;
+                const rFinalNum = parseInt(rRaw.toString().replace(/[^0-9]/g, '')) || 0;
+
                 const n = inputs[2].value || '-';
 
-                volumeTotal += (parseFloat(p) * parseInt(r));
+                // Cálculo de Volume usando os números limpos
+                volumeTotal += (pFinalNum * rFinalNum);
+
                 const status = isMR ? "[MR]" : (isWS ? "[WS]" : "[  ]");
-                doc.text(`${status} Set ${i+1}: ${p}kg x ${r} reps | Obs: ${n}`, 15, y);
+                
+                // No texto do PDF, usamos os números limpos para garantir a formatação
+                doc.text(`${status} Set ${i+1}: ${pFinalNum}kg x ${rFinalNum} reps | Obs: ${n}`, 15, y);
+                
                 y += 6;
                 if (y > 280) { doc.addPage(); y = 20; }
             });
