@@ -1,149 +1,173 @@
-body {
-    background-color: #121212;
-    color: #ffffff;
-    font-family: sans-serif;
+/* Configurações Globais */
+* {
+    box-sizing: border-box;
     margin: 0;
-    padding: 20px;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.container { max-width: 500px; margin: auto; }
+body {
+    background-color: #121212;
+    color: white;
+    padding: 20px;
+    padding-bottom: 120px; /* Espaço para os botões fixos no rodapé */
+}
 
-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+/* Header */
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
 
-select { background: #333; color: white; border: 1px solid #555; padding: 10px; border-radius: 8px; }
+select {
+    background: #2a2a2a;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    font-size: 16px; /* Evita zoom no iOS */
+}
 
+/* Cards de Exercício */
 .card-exercicio {
     background: #1e1e1e;
     border-radius: 12px;
     padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+h3 {
+    margin-bottom: 10px;
+    color: #fff;
+    border-left: 4px solid #007bff;
+    padding-left: 10px;
+}
+
+.nota-fixa {
+    font-size: 0.85em;
+    color: #aaa;
+    font-style: italic;
     margin-bottom: 15px;
-    border: 1px solid #333;
+    line-height: 1.4;
 }
 
-.nota-fixa { color: #aaa; font-style: italic; font-size: 0.9em; margin-bottom: 10px; }
-
-.serie-row { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 10px; margin-top: 10px; }
-
-input {
-    background: #2a2a2a;
-    border: 1px solid #444;
-    color: white;
-    padding: 8px;
-    border-radius: 5px;
-}
-
-#btn-finalizar {
-    width: 100%;
-    padding: 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-/* Container da série usando Flexbox */
+/* Linha da Série */
 .serie-row {
     display: flex;
-    flex-wrap: wrap; /* Permite que a nota pule de linha */
-    gap: 10px; /* Aumentei um pouco o gap para espaçar o check */
-    margin-top: 10px;
-    padding-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
     border-bottom: 1px solid #333;
-    align-items: center; /* Alinha verticalmente os elementos na linha */
-}
-
-/* Novo: Estilo do container do checkbox para alinhamento */
-.check-container {
-    display: flex;
     align-items: center;
-    gap: 6px; /* Espaço entre o check e o texto 'WS' */
-    color: #007bff; /* Cor azul para destacar */
-    font-size: 0.9em;
-    font-weight: bold;
-    flex-shrink: 0; /* Impede que o check diminua */
 }
 
-/* Estilo do input checkbox em si */
-.check-container input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    margin: 0; /* Remove margens padrão */
-    cursor: pointer;
-    accent-color: #007bff; /* Muda a cor de preenchimento do check quando marcado */
-}
-
-/* Inputs numéricos (Peso e Reps) */
-.serie-row input[type="number"] {
-    flex: 1 1 calc(50% - 70px); /* Ajustado para dar espaço ao check */
-    background: #2a2a2a;
-    border: 1px solid #444;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    min-width: 60px;
-}
-
-/* Input de texto (Nota) - Ocupa a linha toda abaixo */
-.serie-row input[type="text"] {
-    flex: 1 1 100%; /* Força a nota a ocupar 100% da largura */
-    background: #2a2a2a;
-    border: 1px solid #444;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 5px;
-}
-/* ... mantenha o resto do CSS ... */
-
-/* Remove as setinhas para navegadores baseados em Webkit (Chrome, Safari, Edge) */
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-/* Remove as setinhas para o Firefox */
-input[type=number] {
-    -moz-appearance: textfield;
-    appearance: textfield;
-}
-/* Garante que o celular não dê zoom ao clicar nos campos */
-input[type="number"], 
-input[type="text"], 
-select {
-    font-size: 16px !important;
-}
-
-/* Opcional: Melhora o toque no celular (faz os campos ficarem maiores para o dedo) */
-.serie-row input {
-    padding: 12px 8px !important;
-}
-
-.btn-add-serie, .btn-finalizar {
-    min-height: 48px; /* Tamanho ideal para o polegar */
-}
-
+/* Controls (WS e MR) */
 .serie-controls {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
+    min-width: 45px;
 }
 
-.mr-label { color: #ff9800 !important; } /* Laranja para Muscle Round */
+.check-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.ws-label { color: #007bff; }
+.mr-label { color: #ff9800; } /* Laranja para Muscle Round */
+
+.check-container input {
+    width: 18px;
+    height: 18px;
+    accent-color: currentColor;
+}
+
+/* Inputs de Texto e Número */
+input[type="number"], 
+input[type="text"] {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: white;
+    padding: 12px 8px;
+    border-radius: 6px;
+    font-size: 16px; /* Essencial para evitar zoom no celular */
+}
+
+.peso-input { flex: 1 1 60px; }
+.reps-input { flex: 1 1 50px; }
+.nota-input { flex: 1 1 100%; margin-top: 5px; }
+
+/* Botões */
+.btn-add-serie {
+    width: 100%;
+    background: transparent;
+    color: #fff;
+    border: 1px dashed #555;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+}
 
 .btn-delete-serie {
-    background: #ff4444;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    width: 30px;
-    height: 30px;
-    cursor: pointer;
-    font-weight: bold;
+    background: #441111;
+    color: #ff4444;
+    border: 1px solid #ff4444;
+    border-radius: 6px;
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* No HTML, adicione o botão de limpar ao lado do de gerar PDF */
-/* <button onclick="exportarPDF()">Finalizar e Gerar PDF</button> */
-/* <button onclick="limparTreinoAtual()" style="background:#666;">Limpar Hoje</button> */
+/* Footer Fixo */
+.actions-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #121212;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-top: 1px solid #333;
+    z-index: 100;
+}
+
+.btn-finalizar {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.btn-limpar {
+    background: #333;
+    color: #ccc;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+/* Ajustes para telas maiores */
+@media (min-width: 600px) {
+    .nota-input { flex: 2 1 200px; margin-top: 0; }
+    .actions-footer { flex-direction: row; justify-content: center; }
+    .btn-finalizar, .btn-limpar { width: 300px; }
+}

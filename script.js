@@ -1,4 +1,4 @@
-// 1. SEUS DADOS DE TREINO (Simulando a Planilha)
+// 1. DADOS DOS TREINOS (A, B, C, D, E)
 const exerciciosData = {
     "A": [
         { nome: "SUPINO RETO", notaFixa: "📌<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
@@ -21,14 +21,14 @@ const exerciciosData = {
         { nome: "CADEIRA EXTENSORA", notaFixa: "📌<br> 1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
         { nome: "PANTURRILHA", notaFixa: "📌<br> 1 OU 2 SÉRIES RECONHECIMENTO (4-6) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" }
     ],
-    "D": [ // Upper
+    "D": [
         { nome: "SUPINO DECLINADO", notaFixa: "📌<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
         { nome: "REMADA BAIXO TRIANGULO", notaFixa: "📌<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
         { nome: "ELEVAÇÃO LATERAL", notaFixa: "📌<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
         { nome: "TRICEPS CORDA", notaFixa: "📌<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" },
         { nome: "ROSCA MARTELO", notaFixa: "📌<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIES DE TRABALHO (5 A 9)" }
     ],
-    "E": [ // Lower
+    "E": [
         { nome: "MESA FLEXORA", notaFixa: "📌<br> 1 SÉRIE AQUECIMENTO (12-15) LONGE DA FALHA.<br>1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>1 SÉRIE DE TRABALHO (5 A 9)" },
         { nome: "LEG PRESS 45", notaFixa: "📌<br> 1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
         { nome: "ADUTORA", notaFixa: "📌<br> 1-2 SÉRIE PREPARATÓRIA (6-8) LONGE DA FALHA.<br>2 SÉRIE DE TRABALHO (5 A 9)" },
@@ -40,19 +40,52 @@ const exerciciosData = {
 const container = document.getElementById('lista-exercicios');
 const seletor = document.getElementById('select-treino');
 
-// 2. FUNÇÃO QUE DESENHA OS EXERCÍCIOS NA TELA
-function criarElementoSerie(peso = '', reps = '', nota = '', pesoAnt = '', repsAnt = '', notaAnt = '', isWorkSet = false, isMR = false) {
+// 2. RENDERIZAR TREINO NA TELA
+function renderizarTreino(tipo) {
+    container.innerHTML = '';
+    const treino = exerciciosData[tipo];
+    if (!treino) return;
+
+    const anterior = JSON.parse(localStorage.getItem(`treino_anterior_${tipo}`)) || [];
+
+    treino.forEach((ex, idx) => {
+        const div = document.createElement('div');
+        div.className = 'card-exercicio';
+        div.innerHTML = `
+            <h3>${ex.nome}</h3>
+            <p class="nota-fixa">${ex.notaFixa}</p>
+            <div id="series-container-${idx}"></div>
+            <button class="btn-add-serie" onclick="adicionarSerie(${idx})">+ Adicionar Série</button>
+        `;
+        container.appendChild(div);
+        
+        const containerSeries = document.getElementById(`series-container-${idx}`);
+        const antEx = anterior[idx];
+        
+        if (antEx && antEx.series && antEx.series.length > 0) {
+            antEx.series.forEach(s => {
+                containerSeries.appendChild(criarElementoSerie('', '', '', s.peso, s.reps, s.nota));
+            });
+        } else {
+            containerSeries.appendChild(criarElementoSerie());
+        }
+    });
+    carregarProgressoSeguro(tipo);
+}
+
+// 3. CRIAR ELEMENTO DE SÉRIE (HTML)
+function criarElementoSerie(peso = '', reps = '', nota = '', pesoAnt = '', repsAnt = '', notaAnt = '', isWS = false, isMR = false) {
     const div = document.createElement('div');
     div.className = 'serie-row';
     
     const pPlaceholder = pesoAnt ? `${pesoAnt} kg` : "Peso";
     const rPlaceholder = repsAnt ? `${repsAnt}` : "Reps";
-    const nPlaceholder = notaAnt ? `${notaAnt}` : "Nota da série";
+    const nPlaceholder = notaAnt ? `${notaAnt}` : "Nota";
 
     div.innerHTML = `
         <div class="serie-controls">
             <label class="check-container ws-label">
-                <input type="checkbox" class="ws-check" ${isWorkSet ? 'checked' : ''} onchange="salvarProgresso()">
+                <input type="checkbox" class="ws-check" ${isWS ? 'checked' : ''} onchange="salvarProgresso()">
                 <span>WS</span>
             </label>
             <label class="check-container mr-label">
@@ -68,242 +101,127 @@ function criarElementoSerie(peso = '', reps = '', nota = '', pesoAnt = '', repsA
     return div;
 }
 
-// Função para remover a série específica
+function adicionarSerie(idx) {
+    document.getElementById(`series-container-${idx}`).appendChild(criarElementoSerie());
+    salvarProgresso();
+}
+
 function removerSerie(botao) {
-    if (confirm("Deseja excluir esta série?")) {
+    if (confirm("Excluir esta série?")) {
         botao.parentElement.remove();
         salvarProgresso();
     }
 }
 
-function renderizarTreino(tipo) {
-    container.innerHTML = ''; // Limpa a tela antes de desenhar
-    const treino = exerciciosData[tipo];
-
-    if (!treino) {
-        container.innerHTML = "<p style='color:#aaa;'>Selecione um treino válido.</p>";
-        return;
-    }
-
-    // Busca o treino ANTERIOR para usar como placeholder (fantasma)
-    const anterior = JSON.parse(localStorage.getItem(`treino_anterior_${tipo}`)) || [];
-
-    treino.forEach((ex, idx) => {
-        const div = document.createElement('div');
-        div.className = 'card-exercicio';
-        div.innerHTML = `
-            <h3>${ex.nome}</h3>
-            <p class="nota-fixa">${ex.notaFixa}</p>
-            <div id="series-container-${idx}">
-                </div>
-            <button class="btn-add-serie" onclick="adicionarSerie(${idx})">+ Adicionar Série</button>
-        `;
-        container.appendChild(div);
-        
-        // Determina se devemos criar linhas baseadas no treino anterior ou uma linha vazia padrão
-        const containerSeries = document.getElementById(`series-container-${idx}`);
-        
-        if (anterior[idx] && anterior[idx].series && anterior[idx].series.length > 0) {
-            // Se houver dados anteriores, cria as linhas baseadas neles
-            anterior[idx].series.forEach(s => {
-                containerSeries.appendChild(criarElementoSerie('', '', '', s.peso, s.reps, s.nota));
-            });
-        } else {
-            // Se for o primeiro treino, cria uma linha vazia padrão
-            containerSeries.appendChild(criarElementoSerie());
-        }
-    });
-
-    // Tenta carregar o progresso atual, se houver (seguro)
-    carregarProgressoSeguro(tipo);
-}
-
-// 3. AUXILIAR PARA CRIAR A LINHA DA SÉRIE COM PLACEHOLDERS
-function criarElementoSerie(peso = '', reps = '', nota = '', pesoAnt = '', repsAnt = '', notaAnt = '') {
-    const div = document.createElement('div');
-    div.className = 'serie-row';
-    
-    // Definição dos placeholders (fantasma)
-    const pPlaceholder = pesoAnt ? `${pesoAnt} kg` : "Peso";
-    const rPlaceholder = repsAnt ? `${repsAnt}` : "Reps";
-    const nPlaceholder = notaAnt ? `${notaAnt}` : "Nota da série";
-
-    // NOVO HTML: Adicionamos o checkbox e demos um 'ref' para Peso, Reps, Nota
-    div.innerHTML = `
-        <label class="check-container">
-            <input type="checkbox" onchange="salvarProgresso()">
-            <span>WS</span>
-        </label>
-        <input type="number" placeholder="${pPlaceholder}" value="${peso}" oninput="salvarProgresso()" class="peso-input">
-        <input type="number" placeholder="${rPlaceholder}" value="${reps}" oninput="salvarProgresso()" class="reps-input">
-        <input type="text" placeholder="${nPlaceholder}" value="${nota}" oninput="salvarProgresso()" class="nota-input">
-    `;
-    return div;
-}
-
-// 4. ADICIONAR SÉRIE MANUALMENTE
-function adicionarSerie(idx) {
-    const sContainer = document.getElementById(`series-container-${idx}`);
-    sContainer.appendChild(criarElementoSerie());
-    salvarProgresso(); // Salva a estrutura nova (quantidade de séries)
-}
-
-// 5. SALVAMENTO AUTOMÁTICO (LocalStorage)
+// 4. PERSISTÊNCIA (LOCALSTORAGE)
 function salvarProgresso() {
     const dadosParaSalvar = [];
-    const cards = document.querySelectorAll('.card-exercicio');
-
-    cards.forEach((card) => {
+    document.querySelectorAll('.card-exercicio').forEach((card) => {
         const nome = card.querySelector('h3').innerText;
         const series = [];
         card.querySelectorAll('.serie-row').forEach(row => {
-            const wsCheck = row.querySelector('.ws-check').checked;
-            const mrCheck = row.querySelector('.mr-check').checked;
             const inputs = row.querySelectorAll('input[type="number"], input[type="text"]');
-            
             series.push({
                 peso: inputs[0].value,
                 reps: inputs[1].value,
                 nota: inputs[2].value,
-                isWorkSet: wsCheck,
-                isMR: mrCheck
+                isWorkSet: row.querySelector('.ws-check').checked,
+                isMR: row.querySelector('.mr-check').checked
             });
         });
         dadosParaSalvar.push({ nome, series });
     });
-
     localStorage.setItem(`treino_atual_${seletor.value}`, JSON.stringify(dadosParaSalvar));
 }
 
-function limparTreinoAtual() {
-    if (confirm("Deseja limpar todos os pesos digitados hoje? Isso não apagará o histórico (fantasmas).")) {
-        const tipo = seletor.value;
-        localStorage.removeItem(`treino_atual_${tipo}`);
-        renderizarTreino(tipo);
-    }
-}
-
-// 6. CARREGAR PROGRESSO ATUAL (Ajustado para não dar erro se estiver em branco)
 function carregarProgressoSeguro(tipo) {
     const salvo = localStorage.getItem(`treino_atual_${tipo}`);
-    if (!salvo) return; // Se não houver nada salvo, não faz nada. Não quebra o site.
-
-    let dados;
-    try {
-        dados = JSON.parse(salvo);
-    } catch (e) {
-        console.error("Erro ao ler progresso salvo", e);
-        return;
-    }
-
+    if (!salvo) return;
+    const dados = JSON.parse(salvo);
     const cards = document.querySelectorAll('.card-exercicio');
-    if (!dados || dados.length === 0 || cards.length === 0) return;
-
-    // Busca o treino anterior (fantasminha) para garantir os placeholders
     const anterior = JSON.parse(localStorage.getItem(`treino_anterior_${tipo}`)) || [];
 
     cards.forEach((card, idx) => {
-        const exercicioSalvo = dados[idx];
-        if (exercicioSalvo && exercicioSalvo.series && exercicioSalvo.series.length > 0) {
-            // Só sobrescreve se houver pelo menos um valor real digitado hoje
-            const temConteudo = exercicioSalvo.series.some(s => s.peso || s.reps || s.nota);
-            
-            if (temConteudo) {
+        const exSalvo = dados[idx];
+        if (exSalvo && exSalvo.series && exSalvo.series.length > 0) {
+            if (exSalvo.series.some(s => s.peso || s.reps || s.nota)) {
                 const sCont = card.querySelector(`[id^="series-container"]`);
-                sCont.innerHTML = ''; // Limpa a série padrão para colocar o que foi salvo hoje
-
-                exercicioSalvo.series.forEach((s, sIdx) => {
-                    // Tenta achar o valor anterior correspondente para o placeholder
+                sCont.innerHTML = '';
+                exSalvo.series.forEach((s, sIdx) => {
                     const sAnt = (anterior[idx] && anterior[idx].series[sIdx]) ? anterior[idx].series[sIdx] : {};
-                    sCont.appendChild(criarElementoSerie(s.peso, s.reps, s.nota, sAnt.peso, sAnt.reps, sAnt.nota));
+                    sCont.appendChild(criarElementoSerie(s.peso, s.reps, s.nota, sAnt.peso, sAnt.reps, sAnt.nota, s.isWorkSet, s.isMR));
                 });
             }
         }
     });
 }
 
-// 7. FINALIZAR E GERAR PDF
+function limparTreinoAtual() {
+    if (confirm("Limpar pesos de hoje? (Fantasmas serão mantidos)")) {
+        localStorage.removeItem(`treino_atual_${seletor.value}`);
+        renderizarTreino(seletor.value);
+    }
+}
+
+// 5. EXPORTAÇÃO PDF COM VOLUME
 function exportarPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    const dataAtual = new Date().toLocaleDateString('pt-BR');
-    const treinoNome = seletor.selectedOptions[0].text;
     const tipo = seletor.value;
-    let volumeTotalTreino = 0;
+    const dataStr = new Date().toLocaleDateString('pt-BR');
+    let volumeTotal = 0;
 
-    // Cabeçalho ... (mesmo código anterior) ...
+    doc.setFontSize(18);
+    doc.text(`Treino: ${seletor.selectedOptions[0].text}`, 10, 20);
+    doc.setFontSize(11);
+    doc.text(`Data: ${dataStr}`, 10, 28);
+    doc.line(10, 32, 200, 32);
 
-    cards.forEach((card) => {
+    let y = 40;
+    document.querySelectorAll('.card-exercicio').forEach(card => {
         const nomeEx = card.querySelector('h3').innerText;
-        const seriesRows = card.querySelectorAll('.serie-row');
-        let temConteudo = false;
+        const rows = card.querySelectorAll('.serie-row');
+        let temDados = Array.from(rows).some(r => r.querySelectorAll('input')[0].value || r.querySelectorAll('input')[1].value);
 
-        // Primeiro passamos para verificar conteúdo e calcular volume do exercício
-        seriesRows.forEach(row => {
-            const inputs = row.querySelectorAll('input[type="number"]');
-            if (inputs[0].value || inputs[1].value) temConteudo = true;
-        });
-
-        if (temConteudo) {
+        if (temDados) {
             doc.setFont("helvetica", "bold");
             doc.text(nomeEx.toUpperCase(), 10, y);
-            y += 8;
-
+            y += 7;
             doc.setFont("helvetica", "normal");
-            seriesRows.forEach((serie, index) => {
-                const isWS = serie.querySelector('.ws-check').checked;
-                const isMR = serie.querySelector('.mr-check').checked;
-                const inputs = serie.querySelectorAll('input[type="number"], input[type="text"]');
 
-                const pFinal = inputs[0].value || inputs[0].getAttribute('placeholder').replace('kg', '').trim() || '0';
-                const rFinal = inputs[1].value || inputs[1].getAttribute('placeholder').trim() || '0';
-                const nota = inputs[2].value || '-';
+            rows.forEach((row, i) => {
+                const inputs = row.querySelectorAll('input[type="number"], input[type="text"]');
+                const isWS = row.querySelector('.ws-check').checked;
+                const isMR = row.querySelector('.mr-check').checked;
 
-                // Cálculo de Volume
-                volumeTotalTreino += (parseFloat(pFinal) * parseInt(rFinal));
+                const p = inputs[0].value || inputs[0].getAttribute('placeholder').replace('kg','').trim() || '0';
+                const r = inputs[1].value || inputs[1].getAttribute('placeholder').trim() || '0';
+                const n = inputs[2].value || '-';
 
-                const prefixo = isMR ? "[MR]" : (isWS ? "[WS]" : "[  ]");
-                const textoLinha = `${prefixo} Set ${index + 1}: ${pFinal} kg x ${rFinal} reps | Obs: ${nota}`;
-                
-                doc.text(textoLinha, 15, y);
-                y += 7;
-                if (y > 270) { doc.addPage(); y = 20; }
+                volumeTotal += (parseFloat(p) * parseInt(r));
+                const status = isMR ? "[MR]" : (isWS ? "[WS]" : "[  ]");
+                doc.text(`${status} Set ${i+1}: ${p}kg x ${r} reps | Obs: ${n}`, 15, y);
+                y += 6;
+                if (y > 280) { doc.addPage(); y = 20; }
             });
-            y += 5;
+            y += 4;
         }
     });
 
-    // Rodapé com Volume Total
     y += 10;
     doc.setFont("helvetica", "bold");
-    doc.line(10, y, 200, y);
-    y += 10;
-    doc.text(`VOLUME TOTAL DO TREINO: ${volumeTotalTreino.toLocaleString()} kg`, 10, y);
+    doc.text(`VOLUME TOTAL: ${volumeTotal.toLocaleString()} kg`, 10, y);
+    doc.save(`Treino_${tipo}_${dataStr.replace(/\//g,'-')}.pdf`);
 
-    doc.save(`Treino_${tipo}_${dataAtual.replace(/\//g, '-')}.pdf`);
-    
-    // Lógica de salvar histórico e limpar atual ... (mesmo código) ...
-
-    // Mógica de salvar para o histórico "Fantasma"
-    const dadosAtuais = localStorage.getItem(`treino_atual_${tipo}`);
-    if (dadosAtuais) {
-        localStorage.setItem(`treino_anterior_${tipo}`, dadosAtuais);
+    // Rotacionar histórico
+    const atual = localStorage.getItem(`treino_atual_${tipo}`);
+    if (atual) {
+        localStorage.setItem(`treino_anterior_${tipo}`, atual);
         localStorage.removeItem(`treino_atual_${tipo}`);
     }
-
-    alert("PDF Gerado com Sucesso!");
     renderizarTreino(tipo);
 }
 
-// 8. EVENT LISTENERS
-seletor.addEventListener('change', (e) => {
-    // Quando muda o treino, renderiza o novo do zero.
-    // A função renderizarTreino já chama internamente o carregarProgressoSeguro
-    renderizarTreino(e.target.value);
-});
-
-// Inicialização (Quando a página abre pela primeira vez)
-window.onload = () => {
-    // Desenha o treino A automaticamente para não ficar em branco
-    renderizarTreino("A");
-};
+// 6. INICIALIZAÇÃO
+seletor.addEventListener('change', (e) => renderizarTreino(e.target.value));
+window.onload = () => renderizarTreino("A");
